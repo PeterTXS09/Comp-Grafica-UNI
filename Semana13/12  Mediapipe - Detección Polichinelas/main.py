@@ -12,8 +12,10 @@ check = True
 
 while True:
     success, img = video.read()
-    videoRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = Pose.process(videoRGB)
+    if not success:
+        break
+    # videoRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = Pose.process(img)
     points = results.pose_landmarks
     draw.draw_landmarks(img, points, pose.POSE_CONNECTIONS)
     # https://developers.google.com/mediapipe/solutions/vision/pose_landmarker
@@ -32,14 +34,18 @@ while True:
 
         dist_manos = math.hypot(manoDX - manoIX, manoDY - manoIY)
         dist_pies = math.hypot(pieDX - pieIX, pieDY - pieIY)
-        print(f'manos:{dist_manos} pies:{dist_pies}')
+        # print(f'manos:{dist_manos} pies:{dist_pies}')
 
-        if check == True and dist_manos <= 0.07 and dist_pies >= 0.14:
+        if check == True and dist_manos <= 0.08 and dist_pies >= 0.14:
             check = False
             contador += 1
         if dist_manos > 0.07 and dist_pies < 0.14:
             check = True
-        #print(contador)
+
+        texto = f'CANT.: {contador}'
+        cv2.rectangle(img, (20,240), (340,120), (255,0,0), -1)
+        cv2.putText(img, texto, (40,200), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 5)
 
     cv2.imshow('Resultado', img)
     cv2.waitKey(40)
+    
